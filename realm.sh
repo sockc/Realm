@@ -69,7 +69,7 @@ EOF
     sleep 2
 }
 
-# =================功能：2. 添加规则=================
+# =================功能：2. 添加规则 (支持 IPv6)=================
 add_rule() {
     if [ ! -f "$BIN_FILE" ]; then
         echo -e "${RED}错误：请先在菜单中安装 Realm！${RESET}"
@@ -81,17 +81,26 @@ add_rule() {
     read -p "2. 请输入目标 IP 或 域名: " REMOTE_IP
     read -p "3. 请输入目标端口: " REMOTE_PORT
 
-    # 追加写入配置文件
+    # 智能判断目标地址是否为纯 IPv6 (判断是否包含冒号)
+    if [[ "$REMOTE_IP" == *":"* ]]; then
+        # 如果是 IPv6，按照标准加上中括号
+        FORMATTED_REMOTE="[${REMOTE_IP}]:${REMOTE_PORT}"
+    else
+        # 如果是 IPv4 或 域名，保持原样
+        FORMATTED_REMOTE="${REMOTE_IP}:${REMOTE_PORT}"
+    fi
+
+    # 追加写入配置文件 (listen 改为 [::] 以同时支持 IPv4 和 IPv6 入口)
     cat >> $CONFIG_FILE <<EOF
 
 [[endpoints]]
-listen = "0.0.0.0:${LOCAL_PORT}"
-remote = "${REMOTE_IP}:${REMOTE_PORT}"
+listen = "[::]:${LOCAL_PORT}"
+remote = "${FORMATTED_REMOTE}"
 EOF
 
     systemctl restart realm
     echo -e "${GREEN}规则添加成功！服务已自动重启生效。${RESET}"
-    echo -e "当前映射：${YELLOW}本机 ${LOCAL_PORT} 端口 -> 目标 ${REMOTE_IP}:${REMOTE_PORT}${RESET}"
+    echo -e "当前映射：${YELLOW}本机双栈 ${LOCAL_PORT} 端口 -> 目标 ${FORMATTED_REMOTE}${RESET}"
     sleep 3
 }
 
