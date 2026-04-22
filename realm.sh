@@ -158,7 +158,7 @@ show_menu() {
     while true; do
         clear
         echo -e "${GREEN}=========================================${RESET}"
-        echo -e "${GREEN}        Realm 端口转发管理脚本 v1.0      ${RESET}"
+        echo -e "${GREEN}        Realm 端口转发管理脚本 v1.2      ${RESET}"
         echo -e "${GREEN}=========================================${RESET}"
         
         # 精准检查运行状态
