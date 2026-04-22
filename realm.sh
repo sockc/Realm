@@ -161,12 +161,15 @@ show_menu() {
         echo -e "${GREEN}        Realm 端口转发管理脚本 v1.0      ${RESET}"
         echo -e "${GREEN}=========================================${RESET}"
         
-        # 检查运行状态
-        if systemctl is-active --quiet realm; then
+        # 精准检查运行状态
+        if [ ! -f "$BIN_FILE" ]; then
+            echo -e "当前状态: ${RED}未安装${RESET}"
+        elif systemctl is-active --quiet realm; then
             echo -e "当前状态: ${GREEN}运行中 (Running)${RESET}"
         else
-            echo -e "当前状态: ${RED}未运行 / 未安装${RESET}"
+            echo -e "当前状态: ${YELLOW}已安装，但未运行 (通常是因为还没添加任何规则)${RESET}"
         fi
+
         
         echo -e "${GREEN}=========================================${RESET}"
         echo -e "${CYAN}1.${RESET} 安装 Realm 环境"
